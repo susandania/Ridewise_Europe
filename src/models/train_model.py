@@ -1,75 +1,83 @@
-"""
-Model training script for churn prediction.
+# src/models/train_model.py
 
-TODO: Implement model training pipeline.
-"""
+import argparse
+from pathlib import Path
 
+import joblib
 import pandas as pd
-import numpy as np
+from sklearn.compose import ColumnTransformer
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-# TODO: Import necessary model classes and metrics
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder
 
 
-def load_data():
-    """
-    Load processed feature data.
-    
-    TODO: Load the processed customer features CSV.
-    """
-    pass
+def parse_args():
+    p = argparse.ArgumentParser()
+
+    p.add_argument("--input-path", default="data/processed/ridewise_churn_modeling_dataset.csv")
+    p.add_argument("--model-out", default="artifacts/churn_model.pkl")
+    p.add_argument("--threshold", type=float, default=0.45)
+    p.add_argument("--split-out", default="artifacts/test_split.pkl")
+    return p.parse_args()
 
 
-def prepare_features(df):
-    """
-    Prepare features for modeling.
-    
-    TODO: 
-    - Select feature columns (exclude target and IDs)
-    - Handle categorical variables (one-hot encoding, etc.)
-    - Return X (features) and y (target)
-    """
-    pass
+def main():
+    args = parse_args()
 
+    # Load modeling dataset
+    df = pd.read_csv(args.input_path)
 
-def train_model(X_train, y_train):
-    """
-    Train the churn prediction model.
-    
-    TODO: 
-    - Choose appropriate model (RandomForest, XGBoost, etc.)
-    - Train the model
-    - Return trained model
-    """
-    pass
+    # Separate target
+    y = df["churned"]
+    X = df.drop(columns=["churned"])
 
+    # Identify column types
+    cat_cols = X.select_dtypes(include=["object", "category"]).columns.tolist()
+    num_cols = X.select_dtypes(exclude=["object", "category"]).columns.tolist()
 
-def evaluate_model(model, X_test, y_test):
-    """
-    Evaluate model performance.
-    
-    TODO:
-    - Make predictions
-    - Calculate metrics (accuracy, precision, recall, F1, ROC-AUC)
-    - Print classification report and confusion matrix
-    """
-    pass
+    # Preprocessing
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ("cat", OneHotEncoder(handle_unknown="ignore"), cat_cols),
+            ("num", "passthrough", num_cols)])
 
+    # Selected Model - tuned Random Forest
+    rf = RandomForestClassifier(
+        n_estimators=200,
+        max_depth=10,
+        min_samples_leaf=20,
+        max_features=0.5,
+        class_weight="balanced",
+        random_state=42,
+        n_jobs=-1)
 
-def save_model(model, filename="churn_model.pkl"):
-    """
-    Save trained model.
-    
-    TODO: Save model using joblib or pickle.
-    """
-    pass
+    model = Pipeline(
+        steps=[
+            ("prep", preprocessor),
+            ("rf", rf),
+        ])
+
+    # Train / test split
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+
+    # Save the exact test split indices (best practice)
+    Path(args.split_out).parent.mkdir(parents=True, exist_ok=True)
+    joblib.dump({"test_index": X_test.index.tolist()}, args.split_out)
+
+    # Fit final model
+    model.fit(X_train, y_train)
+
+    # Save model artifact WITH threshold
+    Path(args.model_out).parent.mkdir(parents=True, exist_ok=True)
+    joblib.dump(
+        {
+            "model": model,
+            "threshold": args.threshold,
+            "features": X.columns.tolist(),
+        },
+        args.model_out)
 
 
 if __name__ == "__main__":
-    # TODO: Implement the training pipeline
-    # 1. Load data
-    # 2. Prepare features
-    # 3. Split data
-    # 4. Train model
-    # 5. Evaluate model
-    # 6. Save model
-    pass
+    main()
