@@ -16,9 +16,9 @@ def parse_args():
     p = argparse.ArgumentParser()
 
     p.add_argument("--input-path", default="data/processed/ridewise_churn_modeling_dataset.csv")
-    p.add_argument("--model-out", default="artifacts/churn_model.pkl")
+    p.add_argument("--model-out", default="models/artifacts/churn_model.pkl")
     p.add_argument("--threshold", type=float, default=0.45)
-    p.add_argument("--split-out", default="artifacts/test_split.pkl")
+    p.add_argument("--split-out", default="models/artifacts/test_split.pkl")
     return p.parse_args()
 
 

@@ -11,8 +11,8 @@ from sklearn.metrics import classification_report, confusion_matrix, roc_auc_sco
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--input-path", default="data/processed/ridewise_churn_modeling_dataset.csv")
-    p.add_argument("--model-path", default="artifacts/churn_model.pkl")
-    p.add_argument("--split-path", default="artifacts/test_split.pkl")
+    p.add_argument("--model-path", default="models/artifacts/churn_model.pkl")
+    p.add_argument("--split-path", default="models/artifacts/test_split.pkl")
     return p.parse_args()
 
 

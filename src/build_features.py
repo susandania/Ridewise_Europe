@@ -15,15 +15,14 @@ def parse_args():
     p.add_argument("--input-path", default="data/processed/ridewise_eda_data.csv")
     p.add_argument("--seg-out", default="data/processed/ridewise_cus_seg.csv")
     p.add_argument("--model-out", default="data/processed/ridewise_churn_modeling_dataset.csv")
-    p.add_argument("--seg-model-out", default="artifacts/segmentation_model.pkl")
+    p.add_argument("--seg-model-out", default="models/artifacts/segmentation_model.pkl")
     return p.parse_args()
 
 
 cus_seg_cols = [
  'age', 'gender', 'cancelled_trips', 'days_since_last_trip', 'churned',
- 'signup_channel', 'income_level', 'payment_method', 'device_type',
- 'total_cancelled_trips', 'net_platform_revenue', 'avg_duration_min',
- 'promo_used_avg', 'total_promo_cost', 'avg_discount_value',
+ 'signup_channel', 'income_level','total_cancelled_trips', 'net_platform_revenue', 
+ 'avg_duration_min', 'promo_used_avg', 'total_promo_cost', 'avg_discount_value',
  'avg_driver_burden', 'driver_borne_total', 'driver_burden_ratio',
  'promo_used_rate', 'promo_dependency', 'revenue_quartile',
  'promo_intensity_q', 'signup_month', 'last_trip_month',
