@@ -1,18 +1,18 @@
-name: CD
+name: CD (Docker Hub)
 
 on:
-  workflow_run:
-    workflows: ["CI"]
-    types:
-      - completed
+  push:
+    branches:
+      - main
+      - Susan_Dev
+  workflow_dispatch:
 
 jobs:
-  docker-publish:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
@@ -24,12 +24,13 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Docker image
+      - name: Build and push
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: Dockerfile
+          file: ./Dockerfile
           push: true
           tags: |
             susandania/ridewise-api:latest
+            susandania/ridewise-api:${{ github.ref_name }}
             susandania/ridewise-api:${{ github.sha }}

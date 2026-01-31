@@ -120,3 +120,15 @@ This project is intended to mirror **industry-style analytics and ML delivery wo
 
 **Maintainer**: RideWise Project Team  
 **Last Updated**: January 2026
+
+
+# RideWise Europe - Docker
+
+Build:
+docker build -t ridewise-api .
+
+Run:
+docker run -p 8000:8000 ridewise-api
+
+Health:
+http://127.0.0.1:8000/health
